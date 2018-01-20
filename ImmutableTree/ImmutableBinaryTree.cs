@@ -10,67 +10,74 @@ namespace ImmutableTree
     {
         public static IBinaryTreeActiveNode<T> Create<T>(T data)
         {
-            return new ActiveNode<T>(data, null, null);
+            return new ActiveNode<T>(data, null, null, null);
         }
 
         public static IBinaryTreeActiveNode<T> Add<T>(this IBinaryTreeActiveNode<T> root, T data)
             where T : IComparable<T>
         {
-            IBinaryTreeActiveNode<T> newRoot = root;
+            IBinaryTreeActiveNode<T> newActive = root;
             IBinaryTreeActiveNode<T> currNode = root;
-            while(true)
+            while (true)
             {
-                if(currNode.Data.CompareTo(data)>0)
+                if (currNode.Data.CompareTo(data) < 0)
                 {
-                    if(currNode.Left == null)
+                    if (currNode.Left == null)
                     {
-                        newRoot = currNode.CreateLeft(data);
+                        newActive = currNode.CreateLeft(data);
                         break;
                     }
                     else
                     {
-                        currNode = currNode.Left;
+                        currNode = currNode.GoLeft();
+                    }
+                }
+                else if (currNode.Data.CompareTo(data) > 0)
+                {
+                    if (currNode.Right == null)
+                    {
+                        newActive = currNode.CreateRight(data);
+                        break;
+                    }
+                    else
+                    {
+                        currNode = currNode.GoRight();
                     }
                 }
                 else
                 {
-                    if (currNode.Right == null)
-                    {
-                        newRoot = currNode.CreateRight(data);
-                        break;
-                    }
-                    else
-                    {
-                        currNode = currNode.Right;
-                    }
+                    break;
                 }
             }
-            
-            return newRoot;
+
+            while (newActive.Parent != null)
+                newActive = newActive.GoUp();
+
+            return newActive;
         }
 
-        public static IEnumerable<T> Enumerate<T>(this IBinaryTreeActiveNode<T> root)
+        public static IEnumerable<T> Enumerate<T>(this INormalNode<T> root)
         {
-            List<T> MyTree = new List<T>();
+            return root.Enumerate(new List<T>());
+        }
 
-            if (root.Left == null && root.Right == null)
+        private static IEnumerable<T> Enumerate<T>(this INormalNode<T> root, List<T> list)
+        {
+            List<T> items = list; 
+
+            if (root.Left != null)
             {
-                MyTree.Add(root.Data);
-            }
-            else
-            {
-                if (root.Left != null)
-                {
-                    root.Left.Enumerate();
-                }
-                if (root.Right != null)
-                {
-                    root.Right.Enumerate();
-                }
-                MyTree.Add(root.Data);
+                items.AddRange(root.Left.Enumerate());
             }
 
-            return MyTree;
+            items.Add(root.Data);
+
+            if (root.Right != null)
+            {
+                items.AddRange(root.Right.Enumerate());
+            }
+
+            return items;
         }
     }
 }

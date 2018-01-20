@@ -6,12 +6,9 @@ using System.Threading.Tasks;
 
 namespace ImmutableTree
 {
-    public interface IBinaryTreeActiveNode<T>
+    public interface IBinaryTreeActiveNode<T> : INormalNode<T>
     {
-        T Data { get; }
-
-        //IBinaryTreeActiveNode<T> Left { get; }
-        //IBinaryTreeActiveNode<T> Right { get; }
+        INode<T> Parent { get; }
 
         IBinaryTreeActiveNode<T> GoUp();
         IBinaryTreeActiveNode<T> GoLeft();
@@ -24,8 +21,15 @@ namespace ImmutableTree
         IBinaryTreeActiveNode<T> DropRight();
     }
 
+
     public interface INode<T>
     {
         T Data { get; }
+    }
+
+    public interface INormalNode<T> : INode<T>
+    {
+        INormalNode<T> Left { get; }
+        INormalNode<T> Right { get; }
     }
 }
